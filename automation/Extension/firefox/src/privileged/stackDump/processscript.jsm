@@ -142,7 +142,7 @@ if (cpmm) {
           }
           if (!stacktrace.length) return;
           stacktrace = stacktrace.join("\n");
-          Cu.reportError("Sending stacktrace")
+          Cu.reportError("Sending stacktrace");
           cpmm.sendAsyncMessage("openwpm-stacktrace",
             { stack:stacktrace, chanelId:channelId  },
           );

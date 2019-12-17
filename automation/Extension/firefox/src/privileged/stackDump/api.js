@@ -13,15 +13,16 @@ XPCOMUtils.defineLazyServiceGetter(
   "nsISubstitutingProtocolHandler"
 );
 
-gOnStackAvailableListeners = new Set();
+const gOnStackAvailableListeners = new Set();
 
 this.stackDump = class extends ExtensionAPI {
   getAPI(context) {
     Services.ppmm.addMessageListener("openwpm-stacktrace",
-    (data) => {
-      data = data.wrappedJSObject;
+    (message) => {
+      Cu.reportError("Receiving stacktrace");
+      const data = message.data;
       gOnStackAvailableListeners.forEach((listener) => {
-        listener(data, data === null);
+        listener(data, true);
        // listener(data.channelId, data.stacktrace);
       });
     });
