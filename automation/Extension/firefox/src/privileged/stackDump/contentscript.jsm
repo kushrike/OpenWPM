@@ -114,6 +114,8 @@ class Controller {
         channel = subject.QueryInterface(Ci.nsIHttpChannel);
         channelId = channel.channelId;
       } catch(e) {
+        Cu.reportError("Couldn't access channel")
+        Cu.reportError(e);
         return;
       }
       let frame = Components.stack;
@@ -137,6 +139,7 @@ class Controller {
       }
       if (!stacktrace.length) return;
       stacktrace = stacktrace.join("\n");
+      Cu.reportError("Sending stacktrace")
       Services.obs.notifyObservers(
         { wrappedJSObject: {stacktrace, channelId } },
         "openwpm-stacktrace"
