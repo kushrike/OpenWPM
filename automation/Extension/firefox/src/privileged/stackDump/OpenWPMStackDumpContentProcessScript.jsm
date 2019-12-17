@@ -1,11 +1,9 @@
 "use strict";
 
-var EXPORTED_SYMBOLS = ["OpenWPMStackDumpChild"];
 const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
 class Controller {
-  constructor(actor) {
-    this.actor = actor;
+  constructor() {
     Services.obs.addObserver(this, "http-on-opening-request");
     Services.obs.addObserver(this, "document-on-opening-request");
   }
@@ -140,27 +138,17 @@ class Controller {
       }
       if (!stacktrace.length) return;
       stacktrace = stacktrace.join("\n");
-      this.actor.sendAsyncMessage("OpenWPM:Callstack", { stacktrace, channelId });
+      Services.obs.notifyObservers(
+        { wrappedJSObject: {stacktrace, channelId } },
+        "openwpm-stacktrace"
+      );
       break;
     }
+    //TODO: listen to message-manager-disconnect and clean up
   }
   willDestroy() {
     Services.obs.removeObserver(this, "http-on-opening-request");
     Services.obs.removeObserver(this, "document-on-opening-request");
   }
 }
-
-class OpenWPMStackDumpChild extends JSWindowActorChild {
-  constructor() {
-    super();
-  }
-  actorCreated() {
-    this.controller = new Controller(this);
-  }
-  willDestroy() {
-    this.controller.willDestroy();
-  }
-  observe() {
-    // stuff
-  }
-};
+const conttroller = new Controller();

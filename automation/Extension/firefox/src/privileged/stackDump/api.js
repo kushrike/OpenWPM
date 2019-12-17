@@ -23,18 +23,13 @@ this.stackDump = class extends ExtensionAPI {
         listener(data.channelId, data.stacktrace);
       });
     }, "openwpm-stacktrace");
-
+    
+    // So we can load a non-privileged code into a privilged context
     resProto.setSubstitution("openwpm", context.extension.rootURI);
-    ChromeUtils.registerWindowActor("OpenWPMStackDump", {
-      parent: {
-        moduleURI: "resource://openwpm/privileged/stackDump/OpenWPMStackDumpParent.jsm",
-      },
-      child: {
-        moduleURI: "resource://openwpm/privileged/stackDump/OpenWPMStackDumpChild.jsm",
-        observers: ["content-document-global-created"],
-      },
-      allFrames: true,
-    });
+    Servives.ppmm.loadProcessScript(
+        "resource://openwpm/privileged/stackDump/OpenWPMStackProcessScript.jsm",
+        true //AllowDelayedLoad so it gets loaded in all windows that will get opened
+    );
 
     return {
       stackDump: {
