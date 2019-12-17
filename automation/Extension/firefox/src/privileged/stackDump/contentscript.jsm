@@ -2,6 +2,8 @@
 
 const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
+Cu.reportError("EXECUTING CHILD SCRIPT!"); 
+
 class Controller {
   constructor() {
     Services.obs.addObserver(this, "http-on-opening-request");
@@ -112,9 +114,6 @@ class Controller {
         channel = subject.QueryInterface(Ci.nsIHttpChannel);
         channelId = channel.channelId;
       } catch(e) {
-        return;
-      }
-      if (!this.matchRequest(channel, { window: this.actor.content })) {
         return;
       }
       let frame = Components.stack;
