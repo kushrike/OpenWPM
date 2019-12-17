@@ -17,17 +17,19 @@ gOnStackAvailableListeners = new Set();
 
 this.stackDump = class extends ExtensionAPI {
   getAPI(context) {
-    Services.obs.addObserver((data) => {
+    Services.ppmm.addMessageListener("openwpm-stacktrace",
+    (data) => {
       data = data.wrappedJSObject;
       gOnStackAvailableListeners.forEach((listener) => {
-        listener(data.channelId, data.stacktrace);
+        listener(data, data === null);
+       // listener(data.channelId, data.stacktrace);
       });
-    }, "openwpm-stacktrace");
+    });
     
     // So we can load a non-privileged code into a privilged context
     resProto.setSubstitution("openwpm", context.extension.rootURI);
     Services.ppmm.loadProcessScript(
-        "resource://openwpm/privileged/stackDump/contentscript.jsm",
+        "resource://openwpm/privileged/stackDump/processscript.jsm",
         true //AllowDelayedLoad so it gets loaded in all windows that will get opened
     );
 
